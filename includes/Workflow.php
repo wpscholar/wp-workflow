@@ -82,11 +82,9 @@ class Workflow {
 			if ( $conditions ) {
 				foreach ( $conditions as $property => $value ) {
 					if ( is_callable( $value ) ) {
-						$match = call_user_func( $value, $step );
-						if ( $match ) {
-							if ( $step->shouldTransition( $id ) ) {
-								$actionableSteps = $step;
-							}
+						$match = $value( $step );
+						if ( $match && $step->shouldTransition( $id ) ) {
+							$actionableSteps = $step;
 						}
 					} else if ( isset( $step->data[ $property ] ) && $step->data[ $property ] === $value ) {
 						if ( $step->shouldTransition( $id ) ) {
@@ -117,8 +115,10 @@ class Workflow {
 		$triggered = false;
 		if ( WorkflowRegistry::has( $name ) ) {
 			$step = WorkflowRegistry::get( $name );
-			$step->data = array_merge( $step->data, $data );
-			$triggered = $step->transition( $id );
+			if ( $step ) {
+				$step->data = array_merge( $step->data, $data );
+				$triggered = $step->transition( $id );
+			}
 		}
 
 		return $triggered;
