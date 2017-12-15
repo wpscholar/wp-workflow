@@ -45,6 +45,8 @@ abstract class WorkflowStep {
 	 */
 	public function __construct( $name, array $data = [] ) {
 
+		$this->name = $name;
+
 		// Setup actions
 		if ( isset( $data['actions'] ) && is_array( $data['actions'] ) ) {
 			foreach ( $data['actions'] as $action ) {
@@ -73,8 +75,6 @@ abstract class WorkflowStep {
 		}
 		unset( $data['capabilities'] );
 
-		// Set class properties
-		$this->name = $name;
 		$this->data = $data;
 	}
 
