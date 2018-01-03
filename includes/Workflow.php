@@ -84,17 +84,17 @@ class Workflow {
 					if ( is_callable( $value ) ) {
 						$match = $value( $step );
 						if ( $match && $step->shouldTransition( $id ) ) {
-							$actionableSteps = $step;
+							$actionableSteps[] = $step;
 						}
 					} else if ( isset( $step->data[ $property ] ) && $step->data[ $property ] === $value ) {
 						if ( $step->shouldTransition( $id ) ) {
-							$actionableSteps = $step;
+							$actionableSteps[] = $step;
 						}
 					}
 				}
 			} else {
 				if ( $step->shouldTransition( $id ) ) {
-					$actionableSteps = $step;
+					$actionableSteps[] = $step;
 				}
 			}
 		}
