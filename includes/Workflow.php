@@ -79,27 +79,40 @@ class Workflow {
 		$steps = WorkflowRegistry::getAll();
 
 		foreach ( $steps as $step ) {
-			if ( $conditions ) {
+			$isActionable = $step->shouldTransition( $id );
+			if ( $isActionable && $conditions ) {
 				foreach ( $conditions as $property => $value ) {
 					if ( is_callable( $value ) ) {
-						$match = $value( $step );
-						if ( $match && $step->shouldTransition( $id ) ) {
-							$actionableSteps[] = $step;
-						}
-					} else if ( isset( $step->data[ $property ] ) && $step->data[ $property ] === $value ) {
-						if ( $step->shouldTransition( $id ) ) {
-							$actionableSteps[] = $step;
-						}
+						$isActionable = $value( $step );
+					} else if ( ! isset( $step->data[ $property ] ) || $step->data[ $property ] !== $value ) {
+						$isActionable = false;
 					}
 				}
-			} else {
-				if ( $step->shouldTransition( $id ) ) {
-					$actionableSteps[] = $step;
-				}
+			}
+			if ( $isActionable ) {
+				$actionableSteps[] = $step;
 			}
 		}
 
 		return $actionableSteps;
+	}
+
+	/**
+	 * Checks if a specific workflow step is actionable.
+	 *
+	 * @param int $id
+	 * @param string $name
+	 *
+	 * @return bool
+	 */
+	public static function isStepActionable( $id, $name ) {
+		$isActionable = false;
+		$step = WorkflowRegistry::get( $name );
+		if ( $step ) {
+			$isActionable = $step->shouldTransition( $id );
+		}
+
+		return $isActionable;
 	}
 
 	/**
