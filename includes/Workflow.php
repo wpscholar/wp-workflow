@@ -82,7 +82,7 @@ class Workflow {
 			$isActionable = $step->shouldTransition( $id );
 			if ( $isActionable && $conditions ) {
 				foreach ( $conditions as $property => $value ) {
-					if ( is_callable( $value ) ) {
+					if ( \is_callable( $value ) ) {
 						$isActionable = $value( $step );
 					} else if ( ! isset( $step->data[ $property ] ) || $step->data[ $property ] !== $value ) {
 						$isActionable = false;
