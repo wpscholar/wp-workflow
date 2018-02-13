@@ -50,8 +50,8 @@ class AutomaticWorkflowStep extends SimpleWorkflowStep {
 	 * Cron callback that executes transitions on returned object IDs.
 	 */
 	public function cron() {
-		$ids = call_user_func( $this->callback );
-		if ( $ids && is_array( $ids ) ) {
+		$ids = \call_user_func( $this->callback );
+		if ( $ids && \is_array( $ids ) ) {
 			foreach ( $ids as $id ) {
 				$this->transition( absint( $id ) );
 			}
