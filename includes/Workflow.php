@@ -129,8 +129,10 @@ class Workflow {
 		if ( WorkflowRegistry::has( $name ) ) {
 			$step = WorkflowRegistry::get( $name );
 			if ( $step ) {
+				do_action( 'wp-workflow:before', $name, $id, $data );
 				$step->data = array_merge( $step->data, $data );
-				$triggered = $step->transition( $id );
+				$triggered  = $step->transition( $id );
+				do_action( 'wp-workflow:after', $name, $id, $data, $triggered );
 			}
 		}
 
