@@ -13,7 +13,7 @@ class Workflow {
 	 * Register a new workflow step
 	 *
 	 * @param string $name
-	 * @param array $args
+	 * @param array  $args
 	 *
 	 * @return WorkflowStep|false Returns class instance success or false on failure.
 	 */
@@ -68,7 +68,7 @@ class Workflow {
 	/**
 	 * Get actionable workflow steps for a specific object.
 	 *
-	 * @param int $id
+	 * @param int   $id
 	 * @param array $conditions
 	 *
 	 * @return WorkflowStep[]
@@ -76,7 +76,7 @@ class Workflow {
 	public static function getActionableSteps( $id, array $conditions = [] ) {
 
 		$actionableSteps = [];
-		$steps = WorkflowRegistry::getAll();
+		$steps           = WorkflowRegistry::getAll();
 
 		foreach ( $steps as $step ) {
 			$isActionable = $step->shouldTransition( $id );
@@ -100,14 +100,14 @@ class Workflow {
 	/**
 	 * Checks if a specific workflow step is actionable.
 	 *
-	 * @param int $id
+	 * @param int    $id
 	 * @param string $name
 	 *
 	 * @return bool
 	 */
 	public static function isStepActionable( $id, $name ) {
 		$isActionable = false;
-		$step = WorkflowRegistry::get( $name );
+		$step         = WorkflowRegistry::get( $name );
 		if ( $step ) {
 			$isActionable = $step->shouldTransition( $id );
 		}
@@ -119,8 +119,8 @@ class Workflow {
 	 * Trigger a workflow step by name for a specific object (and with provided data).
 	 *
 	 * @param string $name
-	 * @param int $id
-	 * @param array $data
+	 * @param int    $id
+	 * @param array  $data
 	 *
 	 * @return bool Returns true on success or false on failure.
 	 */
@@ -129,10 +129,14 @@ class Workflow {
 		if ( WorkflowRegistry::has( $name ) ) {
 			$step = WorkflowRegistry::get( $name );
 			if ( $step ) {
-				do_action( 'wp-workflow:before', $name, $id, $data );
+				if ( has_action( 'wp-workflow:before' ) ) {
+					do_action( 'wp-workflow:before', $name, $id, $data, $step->isEnabled, $step->canTransition(), $step->shouldTransition( $id ) );
+				}
 				$step->data = array_merge( $step->data, $data );
 				$triggered  = $step->transition( $id );
-				do_action( 'wp-workflow:after', $name, $id, $data, $triggered );
+				if ( has_action( 'wp-workflow:after' ) ) {
+					do_action( 'wp-workflow:after', $name, $id, $data, $triggered );
+				}
 			}
 		}
 
